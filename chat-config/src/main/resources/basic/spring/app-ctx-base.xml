@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd  
+            http://www.springframework.org/schema/context  
+            http://www.springframework.org/schema/context/spring-context-4.3.xsd  
+            http://www.springframework.org/schema/tx  
+            http://www.springframework.org/schema/tx/spring-tx-4.3.xsd  
+            http://www.springframework.org/schema/jdbc  
+            http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+            http://www.springframework.org/schema/mvc
+            http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+            ">
+
+	
+	<context:property-placeholder location="classpath:properties/*" file-encoding="UTF-8" ignore-unresolvable="true" />
+	<context:annotation-config />
+	<!-- #### Spring 設定 #### -->
+	<!-- 自動搜索@xxx 進行spring injection -->
+	<context:component-scan base-package="chat.*"/>
+	
+	<!-- Tabris 暫時註解 -->
+	<!-- <context:component-scan base-package="com.test.*"/>
+	<bean class="org.mybatis.spring.support.BaseSqlSessionSupport" /> -->
+
+	<!-- #### Spring MVC 設定 #### -->
+	<!-- 預設 spring 註解映射 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" p:alwaysUseFullPath="false" />
+
+
+	<!--springmvc method 映射 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" p:alwaysUseFullPath="false" />
+	
+	<mvc:annotation-driven />
+	
+<!-- 	<mvc:resources mapping="/app/**" location="/app/"  order="-1"/> -->
+<!-- 	<mvc:resources mapping="/webjars/**" location="/webjars/"  order="-1"/> -->
+<!-- 	<mvc:resources mapping="/assets/**" location="/assets/"  order="-1"/> -->
+<!-- 	<mvc:resources mapping="/commonjs/**" location="/commonjs/"  order="-1"/> -->
+	<mvc:resources mapping="/index.html" location="/index.html"  order="-1"/>
+<!-- 	<mvc:resources mapping="/initlogin.html" location="/initlogin.html"  order="-1"/> -->
+	
+	
+	<!-- 根據用戶端的不同的請求決定不同的view進行回應, 如 /blog/1.json, /blog/1.xml, /blog/1.html -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver" >
+		
+		<property name="contentNegotiationManager" >
+			<bean class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+				<property name="ignoreAcceptHeader" value="true" /> 
+				<property name="defaultContentType" value="application/json" /> 
+		
+<!-- 				副檔名至mimeType的映射,即 /user.json => application/json -->
+				<property name="mediaTypes">
+					<map>
+						<entry key="json" value="application/json" />
+						<entry key="xml" value="application/xml" />
+						<entry key="img" value="image/jpeg" />
+					</map>
+				</property>
+<!-- 				用於開啟 /userinfo/123?format=json 的支持 -->
+				<property name="favorParameter" value="true" />
+			</bean>
+		</property>
+		
+		<property name="defaultViews">
+			<list>
+				<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" >
+					<property name="objectMapper">
+	                    <bean class="base.generic.common.HibernateAwareObjectMapper" />
+	                </property>
+				</bean>
+				<bean class="org.springframework.web.servlet.view.xml.MappingJackson2XmlView" />
+			</list>
+		</property>
+	</bean>
+
+    
+    
+</beans>
